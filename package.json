@@ -1,0 +1,65 @@
+{
+  "name": "second-brain",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:local": "node scripts/dev-local.mjs",
+    "ux:seed": "node scripts/ux-run-ts.mjs scripts/ux-harness/seed-370-brain.ts",
+    "ux:shot": "node scripts/ux-shot.mjs",
+    "ux:walkthroughs": "node scripts/ux-walkthroughs.mjs",
+    "ux:chat": "node scripts/ux-chat.mjs",
+    "predeploy": "node scripts/predeploy-guard.mjs",
+    "check:scope": "node scripts/check-scope.mjs",
+    "deploy": "wrangler deploy",
+    "deploy:worker": "node scripts/release.mjs worker",
+    "deploy:app": "node scripts/release.mjs app",
+    "deploy:all": "node scripts/release.mjs all",
+    "deploy:tag": "node scripts/release.mjs tag",
+    "db:create": "wrangler d1 create second-brain-db",
+    "db:migrate": "wrangler d1 execute second-brain-db --file=db/schema.sql",
+    "db:migrate:remote": "wrangler d1 execute second-brain-db --remote --file=db/schema.sql",
+    "vectors:create": "wrangler vectorize create second-brain-vectors --dimensions=384 --metric=cosine",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "COVERAGE=1 vitest run --coverage",
+    "test:eval:local-models": "EVAL_LOCAL_MODELS=1 vitest run test/eval/local-ai.smoke.test.ts test/eval/legacy-rerank.test.ts",
+    "test:eval:full": "EVAL_FULL=1 EVAL_WORKERD=1 vitest run test/eval",
+    "test:eval:workerd": "EVAL_WORKERD=1 vitest run test/eval/d1.workerd.test.ts test/eval/baseline-lock.workerd.test.ts test/eval/runner.test.ts",
+    "test:eval:scale-guards": "EVAL_SCALE_GUARDS=1 vitest run test/eval/router-guards.scale.test.ts",
+    "test:eval:public-download": "EVAL_PUBLIC_DOWNLOAD=1 vitest run test/eval/public/download.test.ts",
+    "eval:recall": "node scripts/eval-run-ts.mjs test/eval/cli.ts",
+    "cf-typegen": "wrangler types",
+    "typecheck": "wrangler types && tsc --noEmit"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^0.8.2",
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "agents": "^0.20.1",
+    "ical.js": "^2.2.1",
+    "postal-mime": "^2.7.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@huggingface/transformers": "^4.3.0",
+    "@types/node": "^26.1.2",
+    "@vitest/coverage-v8": "^4.1.10",
+    "esbuild": "^0.28.1",
+    "puppeteer-core": "^25.12.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.114.0"
+  },
+  "overrides": {
+    "undici": "7.29.0"
+  },
+  "cloudflare": {
+    "bindings": {
+      "AUTH_TOKEN": {
+        "description": "Your authentication token. Use a memorable phrase (like 'coffee-lover-2026') or generate a secure token with: openssl rand -base64 32. Save it - you'll need this for AI client connections!"
+      }
+    }
+  }
+}
